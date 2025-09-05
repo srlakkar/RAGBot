@@ -1,10 +1,10 @@
-# Flower Image RAG Bot
+# GardenGPT
 
-Flower Image RAG Bot is an open-source demo for retrieval-augmented generation (RAG) pipelines with image inputs, built for both technical and non-technical users.
+GardenGPT is an open-source demo for retrieval-augmented generation (RAG) pipelines with image inputs, built for both technical and non-technical users.
 
 ## 🚀 Value Proposition
 - Democratize visual Q&A and multimodal search for product managers, educators, and AI enthusiasts.
-- Prototype and experiment with SOTA vision-language AI pipelines.
+- Prototype and experiment with vision-language AI pipelines.
 
 ## 🖼️ How It Works
 1. Upload an image.
@@ -55,8 +55,8 @@ This project demonstrates an **end-to-end Retrieval-Augmented Generation (RAG) p
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/flower-image-rag.git
-cd flower-image-rag
+git clone https://github.com/srlakkar/RAGBot.git
+cd RAGBot
 ```
 
 2. Create and activate a virtual environment:

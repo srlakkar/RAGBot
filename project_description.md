@@ -1,4 +1,4 @@
-# Project Description: Flower Image RAG Demo
+# Project Description: GardenGPT
 
 This project demonstrates how **Retrieval-Augmented Generation (RAG)** can be applied to **image-based tasks**. The goal is to enable users to upload an image of a flower, retrieve visually similar images, and generate **context-aware natural language answers** using a Large Language Model (LLM).
 
