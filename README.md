@@ -1,10 +1,29 @@
-# 🌸 Flower Image RAG Demo
+# Flower Image RAG Bot
+
+Flower Image RAG Bot is an open-source demo for retrieval-augmented generation (RAG) pipelines with image inputs, built for both technical and non-technical users.
+
+## 🚀 Value Proposition
+- Democratize visual Q&A and multimodal search for product managers, educators, and AI enthusiasts.
+- Prototype and experiment with SOTA vision-language AI pipelines.
+
+## 🖼️ How It Works
+1. Upload an image.
+2. Automated image captioning (BLIP-2).
+3. Semantic vector search via Qdrant.
+4. Contextual answer generation (GPT-4o).
+
+## 🛠 Use Cases
+- Product catalog Q&A
+- Educational AI tutors
+- Research data enrichment
+
+
+## 🌸 RAG Demo
 
 A **Streamlit-based demo** that combines **image embeddings**, **caption generation (BLIP-2)**, **vector search (Qdrant)**, and **LLM reasoning (OpenAI GPT-4o)** to provide context-aware answers about flower images.
 
 This project demonstrates an **end-to-end Retrieval-Augmented Generation (RAG) pipeline** for visual queries with textual reasoning.
 
----
 
 ## 🚀 Features
 
