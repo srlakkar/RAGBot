@@ -15,7 +15,7 @@ from pipeline import (
 st.set_page_config(layout="wide")
 
 # --- Centered title and subtitle ---
-st.markdown("<h1 style='text-align: center;'>🌸 Flower Image RAG Demo</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>🌸 FGardenGPT RAG Demo</h1>", unsafe_allow_html=True)
 st.markdown(
     "<p style='text-align: center; font-size:18px;'>Upload a flower image, see similar flowers, and ask context-aware questions.</p>",
     unsafe_allow_html=True
