@@ -1,0 +1,24 @@
+# Streamlit for the UI
+streamlit>=1.25.0
+
+# PyTorch and torchvision (GPU compatible)
+torch>=2.1.0
+torchvision>=0.16.0
+
+# Transformers for BLIP-2
+transformers>=4.40.0
+
+# Pillow for image handling
+Pillow>=10.0.0
+
+# Qdrant client for vector DB
+qdrant-client>=1.5.1
+
+# OpenAI SDK
+openai>=1.1.0
+
+# dotenv for environment variables
+python-dotenv>=1.0.0
+
+# Optional: numpy for array operations
+numpy>=1.27.0

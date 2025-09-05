@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 import torch
 from torchvision import models, transforms
-from transformers import BlipProcessor, BlipForConditionalGeneration
+from transformers import Blip2Processor, Blip2ForConditionalGeneration
 from qdrant_client import QdrantClient
 from openai import OpenAI
 import os
@@ -37,9 +37,9 @@ def load_models(device):
     resnet.eval().to(device)
 
     # BLIP for captions
-    processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-    blip = BlipForConditionalGeneration.from_pretrained(
-        "Salesforce/blip-image-captioning-base"
+    processor = Blip2Processor.from_pretrained("Salesforce/blip2-flan-t5-xl")
+    blip = Blip2ForConditionalGeneration.from_pretrained(
+        "Salesforce/blip2-flan-t5-xl", torch_dtype=torch.float16
     ).to(device)
 
     return resnet, processor, blip
@@ -84,7 +84,7 @@ def get_embedding(image_path):
 def generate_caption_blip(image_path):
     image = Image.open(image_path).convert("RGB")
     inputs = processor_blip(images=image, return_tensors="pt")
-    inputs = {k: v.to(device) for k, v in inputs.items()}
+    inputs = {k: v.to(device, dtype=torch.float16) for k, v in inputs.items()}
 
     with torch.no_grad():
         try:
@@ -99,24 +99,47 @@ def generate_caption_blip(image_path):
     torch.cuda.empty_cache()
     return caption
 
+client = QdrantClient(host="localhost", port=6333)
+collection_name = "flower_images"
+
 # -------------------------------
 # Qdrant
 # -------------------------------
 def get_top_neighbors(query_embedding, client, collection_name, top_n=10):
+    """
+    Get top nearest neighbors excluding the query image itself.
+
+    Parameters:
+        query_embedding: np.array
+        client: QdrantClient
+        collection_name: str
+        top_n: number of neighbors to return
+        query_filepath: str or None, path of the query image to exclude
+
+    Returns:
+        List of dicts: [{"filepath": ..., "caption": ...}, ...]
+    """
+    # Fetch extra neighbors in case the query image appears
     results = client.search(
         collection_name=collection_name,
         query_vector=query_embedding.tolist(),
-        limit=top_n
+        limit=top_n + 5
     )
-    neighbors = [
-        {"filepath": p.payload.get("filepath", ""),
-         "caption": p.payload.get("caption", "")}
-        for p in results
-    ]
+
+    neighbors = []
+
+    for p in results[1:]:  # skip the first result (closest, likely query image)
+        filepath = p.payload.get("filepath")
+        caption = p.payload.get("caption", "")
+
+        if filepath:  # skip invalid filepaths
+            neighbors.append({"filepath": filepath, "caption": caption})
+
+        if len(neighbors) >= top_n:
+            break
+
     return neighbors
 
-client = QdrantClient(host="localhost", port=6333)
-collection_name = "flower_images"
 
 # -------------------------------
 # OpenAI

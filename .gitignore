@@ -23,3 +23,5 @@ Thumbs.db
 # Others
 flowers/
 qdrant_storage/
+notebooks/cluster_labels.npy
+notebooks/flower_image_embeddings.npy
