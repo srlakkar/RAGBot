@@ -97,7 +97,7 @@ streamlit run app.py
 
 ## 🖼 Screenshots
 
-> *(Include sample images of the app with query image, neighbors, and LLM response here.)*
+
 
 ---
 
