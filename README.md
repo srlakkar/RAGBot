@@ -97,7 +97,7 @@ streamlit run app.py
 
 ## 🖼 Screenshots
 
-
+![Example](images/RAGScreenshot.png)
 
 ---
 
