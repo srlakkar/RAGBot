@@ -1,0 +1,25 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Streamlit temp
+.streamlit/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Others
+flowers/
+qdrant_storage/

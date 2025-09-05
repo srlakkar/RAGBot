@@ -1,0 +1,23 @@
+[project]
+name = "flowers"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "accelerate>=1.10.1",
+    "ipykernel>=6.30.1",
+    "matplotlib>=3.10.6",
+    "numpy>=2.3.2",
+    "ollama>=0.5.3",
+    "openai>=1.105.0",
+    "pandas>=2.3.2",
+    "pip>=25.2",
+    "python-dotenv>=1.1.1",
+    "qdrant-client>=1.15.1",
+    "scikit-learn>=1.7.1",
+    "streamlit>=1.49.1",
+    "torch>=2.8.0",
+    "torchvision>=0.23.0",
+    "transformers>=4.56.0",
+]

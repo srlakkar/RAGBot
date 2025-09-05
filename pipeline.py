@@ -1,0 +1,136 @@
+import numpy as np
+from PIL import Image
+import torch
+from torchvision import models, transforms
+from transformers import BlipProcessor, BlipForConditionalGeneration
+from qdrant_client import QdrantClient
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
+import streamlit as st
+
+# -------------------------------
+# Config
+# -------------------------------
+USE_GPU = True  # set to False to force CPU always
+
+def get_device():
+    if USE_GPU and torch.cuda.is_available():
+        try:
+            _ = torch.empty(1, device="cuda")  # test allocation
+            return torch.device("cuda")
+        except torch.cuda.OutOfMemoryError:
+            print("⚠️ CUDA OOM → using CPU instead.")
+            torch.cuda.empty_cache()
+    return torch.device("cpu")
+
+device = get_device()
+
+# -------------------------------
+# Model loading (cached for Streamlit)
+# -------------------------------
+@st.cache_resource
+def load_models(device):
+    # ResNet for embeddings
+    resnet = models.resnet50(pretrained=True)
+    resnet = torch.nn.Sequential(*list(resnet.children())[:-1])  # remove fc
+    resnet.eval().to(device)
+
+    # BLIP for captions
+    processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+    blip = BlipForConditionalGeneration.from_pretrained(
+        "Salesforce/blip-image-captioning-base"
+    ).to(device)
+
+    return resnet, processor, blip
+
+model, processor_blip, model_blip = load_models(device)
+
+# -------------------------------
+# Preprocessing
+# -------------------------------
+preprocess = transforms.Compose([
+    transforms.Resize(224),   # safe for ResNet
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    ),
+])
+
+# -------------------------------
+# Embeddings
+# -------------------------------
+def get_embedding(image_path):
+    image = Image.open(image_path).convert("RGB")
+    input_tensor = preprocess(image).unsqueeze(0).to(device)
+
+    with torch.no_grad():
+        try:
+            embedding = model(input_tensor).squeeze().cpu().numpy()
+        except torch.cuda.OutOfMemoryError:
+            print("⚠️ OOM in ResNet → retrying on CPU")
+            torch.cuda.empty_cache()
+            input_tensor = input_tensor.to("cpu")
+            embedding = model.to("cpu")(input_tensor).squeeze().cpu().numpy()
+
+    torch.cuda.empty_cache()
+    return embedding
+
+# -------------------------------
+# Captions
+# -------------------------------
+def generate_caption_blip(image_path):
+    image = Image.open(image_path).convert("RGB")
+    inputs = processor_blip(images=image, return_tensors="pt")
+    inputs = {k: v.to(device) for k, v in inputs.items()}
+
+    with torch.no_grad():
+        try:
+            out = model_blip.generate(**inputs)
+        except torch.cuda.OutOfMemoryError:
+            print("⚠️ OOM in BLIP → retrying on CPU")
+            torch.cuda.empty_cache()
+            inputs = {k: v.to("cpu") for k, v in inputs.items()}
+            out = model_blip.to("cpu").generate(**inputs)
+
+    caption = processor_blip.decode(out[0], skip_special_tokens=True)
+    torch.cuda.empty_cache()
+    return caption
+
+# -------------------------------
+# Qdrant
+# -------------------------------
+def get_top_neighbors(query_embedding, client, collection_name, top_n=10):
+    results = client.search(
+        collection_name=collection_name,
+        query_vector=query_embedding.tolist(),
+        limit=top_n
+    )
+    neighbors = [
+        {"filepath": p.payload.get("filepath", ""),
+         "caption": p.payload.get("caption", "")}
+        for p in results
+    ]
+    return neighbors
+
+client = QdrantClient(host="localhost", port=6333)
+collection_name = "flower_images"
+
+# -------------------------------
+# OpenAI
+# -------------------------------
+load_dotenv()
+openai_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+def query_gpt4(prompt, max_tokens=800):
+    response = openai_client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a helpful botanist."},
+            {"role": "user", "content": prompt}
+        ],
+        max_tokens=max_tokens
+    )
+    return response.choices[0].message.content.strip()
