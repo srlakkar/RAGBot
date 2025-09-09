@@ -15,7 +15,7 @@ from pipeline import (
 st.set_page_config(layout="wide")
 
 # --- Centered title and subtitle ---
-st.markdown("<h1 style='text-align: center;'>🌸 FGardenGPT RAG Demo</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>🌸 GardenGPT RAG Demo</h1>", unsafe_allow_html=True)
 st.markdown(
     "<p style='text-align: center; font-size:18px;'>Upload a flower image, see similar flowers, and ask context-aware questions.</p>",
     unsafe_allow_html=True
@@ -36,7 +36,7 @@ with left_col:
             query_image_path = tmp.name
 
         # Show query image
-        st.image(query_image_path, caption="Query Image", use_container_width=True)
+        st.image(query_image_path, caption="Query Image", width='stretch')
 
 with right_col:
     if uploaded_file is not None:
