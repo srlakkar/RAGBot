@@ -12,7 +12,7 @@ import streamlit as st
 # -------------------------------
 # Config
 # -------------------------------
-USE_GPU = True  # set to False to force CPU always
+USE_GPU = False  # set to False to force CPU always
 
 def get_device():
     if USE_GPU and torch.cuda.is_available():
