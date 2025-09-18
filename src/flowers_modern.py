@@ -12,89 +12,14 @@ from pipeline import (
     collection_name,
 )
 
-# --- Page setup ---
-st.set_page_config(layout="wide", page_title="GardenGPT — Demo", page_icon="🌸")
+# --- Page setup: wide layout ---
+st.set_page_config(layout="wide")
 
-# --- CSS / UI ---
+# --- Centered title and subtitle ---
+st.markdown("<h1 style='text-align: center;'>🌸 GardenGPT Demo</h1>", unsafe_allow_html=True)
 st.markdown(
-    """
-    <style>
-    :root{
-        --bg:#f6f7f9;
-        --card:#ffffff;
-        --muted:#6b7280;
-        --accent:#2563eb;
-        --radius:12px;
-    }
-    .stApp { background: linear-gradient(180deg,var(--bg),#fbfcfd); font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; padding:10px 12px 18px 12px; }
-    .brand {
-    display: flex;
-    flex-direction: column;
-    align-items: center;   /* center horizontally */
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 12px;
-    text-align: center;
-    }
-    .brand h1 {
-    font-size: 28px;  /* increase title size */
-    margin: 0;
-    font-weight: 700;
-    }
-    .brand p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 14px;  /* slightly larger */
-    }
-    .logo {
-    width: 60px;   /* bigger logo box */
-    height: 60px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(37,99,235,0.06));
-    font-size: 28px;  /* bigger emoji */
-    }
-    .card { background:var(--card); border-radius:var(--radius); padding:14px; box-shadow: 0 6px 18px rgba(15,23,42,0.04); margin-bottom:12px; }
-    .section-label { font-size:14px; font-weight:600; margin-bottom:8px; color:#0f172a; }
-    .muted { color:var(--muted); font-size:12px; }
-
-    /* uploader */
-    .stFileUploader { border-radius:10px !important; padding:10px !important; }
-
-    /* images */
-    .stImage > img { border-radius:10px; box-shadow: 0 4px 14px rgba(15,23,42,0.06); }
-
-    /* small captions */
-    .small-caption { font-size:12px; color:var(--muted); }
-
-    /* compact chat */
-    .chat { max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; }
-    .bubble { padding:8px 10px; border-radius:10px; font-size:13px; }
-    .bubble.user { align-self:flex-end; background: linear-gradient(90deg, rgba(37,99,235,0.07), rgba(37,99,235,0.03)); font-weight:600; }
-    .bubble.assistant { align-self:flex-start; background:#f8fafc; }
-
-    @media (max-width:880px){
-        .brand h1 { font-size:16px; }
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# --- Header ---
-st.markdown(
-    """
-    <div class="brand">
-      <div class="logo">🌸</div>
-      <div>
-        <h1>GardenGPT</h1>
-        <p class="muted">Upload a flower, see similar flowers & ask questions.</p>
-      </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
+    "<p style='text-align: center; font-size:18px;'>Upload a flower image, see similar flowers, and ask context-aware questions.</p>",
+    unsafe_allow_html=True
 )
 
 # --- Helpers to manage session state ---
@@ -139,7 +64,7 @@ with left_col:
             st.session_state["uploaded_file_hash"] = file_hash
 
             # compute embedding, neighbors, and captions ONCE
-            with st.spinner("🔎 Analyzing image (this runs only once per upload)..."):
+            with st.spinner("🔎 Analyzing image ..."):
                 embedding = get_embedding(st.session_state["query_image_path"])
                 neighbors = get_top_neighbors(embedding, client, collection_name, top_n=5) or []
                 # Ensure each neighbor has a caption (generate if missing) and keep filepath absolute
